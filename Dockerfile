@@ -1,0 +1,2 @@
+FROM node:26
+EXPOSE 5000

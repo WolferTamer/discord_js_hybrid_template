@@ -1,0 +1,29 @@
+{
+  "name": "discord_js_hybrid_template",
+  "version": "0.1.0",
+  "description": "A base discord.js bot developed with TypeScript that handles slash commands and traditional prefix commands inherently.",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "(npm run build || exit 1) && node dist/index.js",
+    "dev": "tsx watch src/index.ts"
+  },
+  "keywords": [
+    "discord",
+    "discord.js",
+    "bot"
+  ],
+  "author": "Caleb Cassin",
+  "license": "MIT",
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^26.0.0",
+    "dotenv": "^17.4.2",
+    "nodemon": "^3.1.14",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "discord.js": "^14.26.4"
+  }
+}
