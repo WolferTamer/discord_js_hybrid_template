@@ -6,7 +6,9 @@
   "scripts": {
     "build": "tsc",
     "start": "(npm run build || exit 1) && node dist/index.js",
-    "dev": "tsx watch src/index.ts"
+    "dev": "tsx watch src/index.ts",
+    "register:dev": "tsx src/scripts/registerCommands.ts",
+    "register": "node dist/scripts/registerCommands.js"
   },
   "keywords": [
     "discord",

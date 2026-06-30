@@ -12,7 +12,7 @@ export default class BaseClient extends Client {
   public commands: CommandModule;
   public events: EventModule;
   public readonly dirname: string;
-  constructor() {
+  constructor(registerCommands: boolean = false) {
     super({
       intents: [
         ...[
@@ -33,8 +33,11 @@ export default class BaseClient extends Client {
     this.commands = new CommandModule(this);
     this.events = new EventModule(this);
     this.dirname = existsSync("./src") ? "./src" : "./";
-
-    this.commands.loadAll();
+    if (registerCommands) {
+      this.commands.loadAndRegisterAll();
+    } else {
+      this.commands.loadAll();
+    }
     this.events.loadAll();
   }
 

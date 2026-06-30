@@ -1,16 +1,16 @@
-import { ApplicationCommandOptionData } from "discord.js";
+import { ApplicationCommandOptionData, SlashCommandBuilder } from "discord.js";
 import BaseComponent from "./BaseComponent.js";
 import { Context } from "./Context.js";
 
 /** Representation of a Command. */
 export default class Command extends BaseComponent {
-  public readonly options: ApplicationCommandOptionData[];
+  public readonly data: SlashCommandBuilder;
   constructor(
     id: string,
-    execute: (context: Context) => void,
-    options: ApplicationCommandOptionData[],
+    execute: (context: Context) => Promise<void>,
+    options: SlashCommandBuilder,
   ) {
     super(id, execute);
-    this.options = options;
+    this.data = options;
   }
 }

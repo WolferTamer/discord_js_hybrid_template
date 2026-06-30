@@ -8,11 +8,13 @@ import {
   ChatInputCommandInteraction,
   Client,
   Guild,
+  InteractionDeferReplyOptions,
   InteractionEditReplyOptions,
   InteractionReplyOptions,
   Message,
   MessageCreateOptions,
   MessageEditOptions,
+  MessageFlags,
   MessageReplyOptions,
   PartialGroupDMChannel,
   SendableChannels,
@@ -123,10 +125,14 @@ export class Context {
   async defer(options: UniversalMessageOptions): Promise<Message> {
     const response = this.normalizeOptions(options);
     if (this.isInteraction) {
-      await this.interaction!.deferReply();
-      this.response = await this.interaction!.editReply(
-        response.interactionEdit,
-      );
+      this.response = await (
+        await this.interaction!.deferReply({
+          flags:
+            options.flags && options.flags == MessageFlags.Ephemeral
+              ? MessageFlags.Ephemeral
+              : undefined,
+        })
+      ).fetch();
       return this.response;
     } else {
       this.response = await this.channel.send(response.messageCreate);
