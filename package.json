@@ -8,7 +8,8 @@
     "start": "(npm run build || exit 1) && node dist/index.js",
     "dev": "tsx watch src/index.ts",
     "register:dev": "tsx src/scripts/registerCommands.ts",
-    "register": "node dist/scripts/registerCommands.js"
+    "register": "node dist/scripts/registerCommands.js",
+    "lint": "npx eslint src/"
   },
   "keywords": [
     "discord",
@@ -19,11 +20,16 @@
   "license": "MIT",
   "type": "module",
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/node": "^26.0.0",
     "dotenv": "^17.4.2",
+    "eslint": "^10.6.0",
+    "globals": "^17.7.0",
+    "jiti": "^2.7.0",
     "nodemon": "^3.1.14",
     "tsx": "^4.22.4",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.62.1"
   },
   "dependencies": {
     "discord.js": "^14.26.4"

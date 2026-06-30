@@ -6,4 +6,4 @@ dotenv.config();
 Config.validateConfig();
 
 import BaseClient from "../client.js";
-const client = new BaseClient(true);
+new BaseClient(true);

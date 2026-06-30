@@ -4,10 +4,10 @@ import { Context } from "./Context.js";
 export default abstract class BaseComponent {
   public readonly id: string;
   public filename: string | null;
-  public readonly execute: (context: Context, options: any) => Promise<void>;
+  public readonly execute: (context: Context, options: object) => Promise<void>;
   constructor(
     id: string,
-    execute: (context: Context, options: any) => Promise<void>,
+    execute: (context: Context, options: object) => Promise<void>,
   ) {
     this.id = id;
     this.execute = execute;

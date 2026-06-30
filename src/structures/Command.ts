@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionData, SlashCommandBuilder } from "discord.js";
+import { SlashCommandBuilder } from "discord.js";
 import BaseComponent from "./BaseComponent.js";
 import { Context } from "./Context.js";
 

@@ -7,12 +7,10 @@ import {
   APIMessageTopLevelComponent,
   Attachment,
   AttachmentPayload,
-  BitFieldResolvable,
   BufferResolvable,
   JSONEncodable,
   MessageActionRowComponentData,
   MessageFlags,
-  MessageFlagsString,
   MessageMentionOptions,
   TopLevelComponentData,
 } from "discord.js";

@@ -1,5 +1,4 @@
 import {
-  ApplicationCommandOptionData,
   ChatInputCommandInteraction,
   Collection,
   Interaction,
@@ -56,13 +55,13 @@ export default class CommandModule extends BaseModule<string, Command> {
   }
 
   //TODO: Implement a parsing function that will use command data to create an object containing all the options information
-  private parseInteractionArgs(interaction: ChatInputCommandInteraction) {}
+  //private parseInteractionArgs(interaction: ChatInputCommandInteraction) {}
 
   //TODO: Implement a parsing function that will use command data to create an object containing all the options information from the message
-  private parseMessageArgs(
+  /*private parseMessageArgs(
     message: Message,
     options: ApplicationCommandOptionData[],
-  ) {}
+  ) {}*/
 
   /**
    * Imports the provided file as a Command object and adds it to the collection.
@@ -104,7 +103,7 @@ export default class CommandModule extends BaseModule<string, Command> {
 
   registerCommands(): void {
     const comms: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
-    for (let comm of this.collection.values()) {
+    for (const comm of this.collection.values()) {
       comms.push(comm.data.toJSON());
     }
     const rest = new REST().setToken(Config.TOKEN);
@@ -116,9 +115,8 @@ export default class CommandModule extends BaseModule<string, Command> {
         );
 
         // The put method is used to fully refresh all commands in the guild with the current set
-        let data;
         if (Config.GUILD) {
-          data = await rest.put(
+          await rest.put(
             Routes.applicationGuildCommands(Config.CLIENT_ID, Config.GUILD),
             { body: comms },
           );

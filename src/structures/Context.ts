@@ -3,12 +3,9 @@
 */
 
 import {
-  Channel,
-  ChannelType,
   ChatInputCommandInteraction,
   Client,
   Guild,
-  InteractionDeferReplyOptions,
   InteractionEditReplyOptions,
   InteractionReplyOptions,
   Message,

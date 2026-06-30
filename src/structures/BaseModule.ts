@@ -1,7 +1,7 @@
 import { Collection } from "discord.js";
 import BaseClient from "../client.js";
 import { join, relative } from "path";
-import { existsSync, readdir, readdirSync } from "fs";
+import { existsSync, readdirSync } from "fs";
 
 /** Super class for modules in which allows files to be automatically imported and registered with the client. */
 export default abstract class BaseModule<T, V> {
@@ -62,7 +62,7 @@ export default abstract class BaseModule<T, V> {
    */
   remove(id: T): void {
     if (!this.collection.has(id)) throw Error("No item by that id exists.");
-    const item = this.collection.get(id);
+    this.collection.get(id);
 
     this.collection.delete(id);
   }

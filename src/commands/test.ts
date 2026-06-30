@@ -1,6 +1,7 @@
 import {
   ActionRowBuilder,
   ButtonBuilder,
+  ButtonInteraction,
   ButtonStyle,
   ComponentType,
   EmbedBuilder,
@@ -31,7 +32,7 @@ export default new Command(
       embeds: [embed],
       flags: undefined,
     });
-    const filter = (i: any) => i.user.id == ctx.author.id;
+    const filter = (i: ButtonInteraction) => i.user.id == ctx.author.id;
     const collector = response.createMessageComponentCollector({
       componentType: ComponentType.Button,
       time: 60_000,
