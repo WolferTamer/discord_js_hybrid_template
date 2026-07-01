@@ -51,6 +51,9 @@ export interface UniversalMessageOptions {
   flags?: MessageFlags | undefined;
 }
 
+/**
+ * Contains all the possible types that could be returned by a get option call.
+ */
 export type OptionType =
   | string
   | boolean

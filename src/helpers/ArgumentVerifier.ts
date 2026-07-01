@@ -4,6 +4,9 @@ import {
 } from "discord.js";
 import { OptionType } from "../types.js";
 
+/**
+ * Class that verifies the arguments of a given command.
+ */
 export default class ArgumentVerifier {
   private options: APIApplicationCommandOption[];
   private args: string[];
@@ -12,6 +15,10 @@ export default class ArgumentVerifier {
     this.args = args;
   }
 
+  /**
+   * Parses through the given options and arguments and returns the resulting object or throws an error if any are invalid.
+   * @returns {{ [keyof: string]: OptionType }}
+   */
   public parse(): { [keyof: string]: OptionType } {
     const results: { [keyof: string]: OptionType } = {};
     let index = 0;
@@ -36,6 +43,12 @@ export default class ArgumentVerifier {
     return results;
   }
 
+  /**
+   * Makes sure the provided number matches the required parameters.
+   * @param {APIApplicationCommandOption} option
+   * @param {number} index
+   * @returns {number}
+   */
   private verifyNum(
     option: APIApplicationCommandOption,
     index: number,
@@ -55,6 +68,12 @@ export default class ArgumentVerifier {
     return -1;
   }
 
+  /**
+   * Makes sure the provided string matches the required parameters. Empty string if the number is not required.
+   * @param {APIApplicationCommandOption} option
+   * @param {number} index
+   * @returns {string}
+   */
   private verifyString(
     option: APIApplicationCommandOption,
     index: number,
@@ -92,6 +111,12 @@ export default class ArgumentVerifier {
     return "";
   }
 
+  /**
+   * Makes sure the provided boolean matches the required parameters.
+   * @param {APIApplicationCommandOption} option
+   * @param {number} index
+   * @returns {bolean}
+   */
   private verifyBoolean(
     option: APIApplicationCommandOption,
     index: number,
@@ -117,6 +142,12 @@ export default class ArgumentVerifier {
     return false;
   }
 
+  /**
+   * Makes sure the provided integer matches the required parameters.
+   * @param {APIApplicationCommandOption} option
+   * @param {number} index
+   * @returns {number}
+   */
   private verifyInteger(
     option: APIApplicationCommandOption,
     index: number,

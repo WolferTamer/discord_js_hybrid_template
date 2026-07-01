@@ -30,7 +30,6 @@ export default class CommandModule extends BaseModule<string, Command> {
   constructor(client: BaseClient) {
     super(client, "commands");
 
-    //TODO: Implement listeners
     client.addListener(
       "interactionCreate",
       async (interaction: Interaction) => {
@@ -71,7 +70,12 @@ export default class CommandModule extends BaseModule<string, Command> {
     });
   }
 
-  //TODO: Implement a parsing function that will use command data to create an object containing all the options information
+  /**
+   * Parses through the options provided for a function and returns them in the form of an object.
+   * @param {ChatInputCommandInteraction} interaction
+   * @param {Command} command
+   * @returns {{ [key: string]: OptionType }}
+   */
   private parseInteractionArgs(
     interaction: ChatInputCommandInteraction,
     command: Command,
@@ -87,6 +91,12 @@ export default class CommandModule extends BaseModule<string, Command> {
     return args;
   }
 
+  /**
+   * Switch statement to get the value of a given option
+   * @param {ChatInputCommandInteraction} interaction
+   * @param {APIApplicationCommandOption} opt
+   * @returns {OptionType | null}
+   */
   private getValueFromOption(
     interaction: ChatInputCommandInteraction,
     opt: APIApplicationCommandOption,
@@ -118,7 +128,16 @@ export default class CommandModule extends BaseModule<string, Command> {
   }
 
   //TODO: Implement a parsing function that will use command data to create an object containing all the options information from the message
-  private parseMessageArgs(message: Message, command: Command) {
+  /**
+   * Description
+   * @param {Message} message
+   * @param {Command} command
+   * @returns {{[key: string]: OptionType} | {error: unknown}}
+   */
+  private parseMessageArgs(
+    message: Message,
+    command: Command,
+  ): { [key: string]: OptionType } | { error: unknown } {
     const messageArgs = message.content.split(" ").toSpliced(0, 1);
     const options = command.data.toJSON().options;
     if (!options) return {};
@@ -155,6 +174,9 @@ export default class CommandModule extends BaseModule<string, Command> {
     }
   }
 
+  /**
+   * Async function that registers all the commands as they are loaded.
+   */
   async loadAndRegisterAll(): Promise<void> {
     const files = this.getFiles();
     const promises: Promise<void>[] = [];
@@ -169,6 +191,9 @@ export default class CommandModule extends BaseModule<string, Command> {
     this.registerCommands();
   }
 
+  /**
+   * Registers all the command that were added to the collection.
+   */
   registerCommands(): void {
     const comms: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
     for (const comm of this.collection.values()) {
