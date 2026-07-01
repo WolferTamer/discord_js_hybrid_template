@@ -4,14 +4,19 @@ import {
   APIComponentInActionRow,
   APIComponentInMessageActionRow,
   APIEmbed,
+  APIInteractionDataResolvedGuildMember,
   APIMessageTopLevelComponent,
   Attachment,
   AttachmentPayload,
+  BaseChannel,
   BufferResolvable,
+  CommandInteractionOption,
+  GuildMember,
   JSONEncodable,
   MessageActionRowComponentData,
   MessageFlags,
   MessageMentionOptions,
+  Role,
   TopLevelComponentData,
 } from "discord.js";
 import Stream from "stream";
@@ -45,3 +50,17 @@ export interface UniversalMessageOptions {
   )[];
   flags?: MessageFlags | undefined;
 }
+
+export type OptionType =
+  | string
+  | boolean
+  | undefined
+  | number
+  | Attachment
+  | CommandInteractionOption<"raw">["role"]
+  | CommandInteractionOption<"raw">["channel"]
+  | BaseChannel
+  | Role
+  | GuildMember
+  | APIInteractionDataResolvedGuildMember
+  | CommandInteractionOption<"raw">["user"];

@@ -18,9 +18,10 @@ export default new Command(
       flags: MessageFlags.Ephemeral,
     });
     await new Promise((r) => setTimeout(r, 2000));
+    const val = ctx.args["testoption"] as string | undefined;
     const embed = new EmbedBuilder()
       .setTitle("Test Embed!")
-      .setDescription("this is a big ol' test.")
+      .setDescription(val ?? "this is a big ol' test.")
       .setFooter({ text: "this may be a footer" });
     const button = new ButtonBuilder()
       .setLabel("Edit Message")
@@ -52,5 +53,12 @@ export default new Command(
   },
   new SlashCommandBuilder()
     .setName("test_command")
-    .setDescription("test descr"),
+    .setDescription("test descr")
+    .addStringOption((opt) =>
+      opt
+        .setName("testoption")
+        .setDescription("An extra option")
+        .setRequired(false)
+        .setMaxLength(50),
+    ),
 );

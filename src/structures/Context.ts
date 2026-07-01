@@ -17,7 +17,7 @@ import {
   SendableChannels,
   User,
 } from "discord.js";
-import { UniversalMessageOptions } from "../types.js";
+import { OptionType, UniversalMessageOptions } from "../types.js";
 
 /**Class that acts as a dynamic context that can handle both messages and command interactions. Interface between the command logic and message sending. */
 export class Context {
@@ -32,7 +32,7 @@ export class Context {
   author: User;
   guild: Guild | null;
   response: Message | null;
-  args: object;
+  args: { [key: string]: OptionType };
   /**
    * Creates the context object using either a message or interaction and the parsed arguments/options for the command.
    * This class should not use the Command object itself.
@@ -40,7 +40,10 @@ export class Context {
    * @param {ChatInputCommandInteraction|Message} context
    * @param {object} args - The arguments provided in the command execution. structure of {argumentKey: argumentValue}
    */
-  constructor(context: ChatInputCommandInteraction | Message, args: object) {
+  constructor(
+    context: ChatInputCommandInteraction | Message,
+    args: { [key: string]: OptionType },
+  ) {
     this.context = context;
     this.isInteraction = context instanceof ChatInputCommandInteraction;
     this.interaction = this.isInteraction

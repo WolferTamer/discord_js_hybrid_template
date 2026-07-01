@@ -1,4 +1,6 @@
 import {
+  APIApplicationCommandOption,
+  ApplicationCommandOptionType,
   ChatInputCommandInteraction,
   Collection,
   Interaction,
@@ -7,12 +9,15 @@ import {
   REST,
   RESTPostAPIChatInputApplicationCommandsJSONBody,
   Routes,
+  TextChannel,
 } from "discord.js";
 import BaseClient from "../client.js";
 import BaseModule from "./BaseModule.js";
 import Command from "./Command.js";
 import { Context } from "./Context.js";
 import Config from "../config.js";
+import ArgumentVerifier from "../helpers/ArgumentVerifier.js";
+import { OptionType } from "../types.js";
 
 /**Class that handles the tracking and executing of commands. */
 export default class CommandModule extends BaseModule<string, Command> {
@@ -34,12 +39,14 @@ export default class CommandModule extends BaseModule<string, Command> {
           !(interaction instanceof ChatInputCommandInteraction)
         )
           return;
-        const context = new Context(interaction, {});
         const command = this.collection.get(interaction.commandName);
+        if (!command) return;
+        const args = this.parseInteractionArgs(interaction, command);
+        const context = new Context(interaction, args);
         if (!command) {
           throw Error("Command does not exist");
         }
-        await command.execute(context, {});
+        await command.execute(context);
       },
     );
 
@@ -49,19 +56,80 @@ export default class CommandModule extends BaseModule<string, Command> {
       const commandId = args[0].substring(1);
       const command = this.collection.get(commandId);
       if (!command) return;
-      const context = new Context(message, {});
-      await command.execute(context, {});
+      const parsedArgs = this.parseMessageArgs(message, command);
+      if (parsedArgs.error) {
+        (message.channel as TextChannel).send(
+          `Unable to parse your command. ${parsedArgs.error}`,
+        );
+      } else {
+        const context = new Context(
+          message,
+          parsedArgs as { [keyof: string]: OptionType },
+        );
+        await command.execute(context);
+      }
     });
   }
 
   //TODO: Implement a parsing function that will use command data to create an object containing all the options information
-  //private parseInteractionArgs(interaction: ChatInputCommandInteraction) {}
+  private parseInteractionArgs(
+    interaction: ChatInputCommandInteraction,
+    command: Command,
+  ): { [key: string]: OptionType } {
+    const commandData = command.data.toJSON();
+    const options = commandData.options;
+    const args: { [key: string]: OptionType } = {};
+    if (!options) return {};
+    for (const opt of options) {
+      const val = this.getValueFromOption(interaction, opt);
+      if (val) args[opt.name] = val;
+    }
+    return args;
+  }
+
+  private getValueFromOption(
+    interaction: ChatInputCommandInteraction,
+    opt: APIApplicationCommandOption,
+  ): OptionType | null {
+    switch (opt.type) {
+      case ApplicationCommandOptionType.Attachment:
+        return interaction.options.getAttachment(opt.name, opt.required);
+      case ApplicationCommandOptionType.Channel:
+        return interaction.options.getChannel(opt.name, opt.required);
+      case ApplicationCommandOptionType.Boolean:
+        return interaction.options.getBoolean(opt.name, opt.required);
+      case ApplicationCommandOptionType.Integer:
+        return interaction.options.getInteger(opt.name, opt.required);
+      case ApplicationCommandOptionType.Mentionable:
+        return interaction.options.getMentionable(opt.name, opt.required);
+      case ApplicationCommandOptionType.Number:
+        return interaction.options.getNumber(opt.name, opt.required);
+      case ApplicationCommandOptionType.Role:
+        return interaction.options.getRole(opt.name, opt.required);
+      case ApplicationCommandOptionType.String:
+        return interaction.options.getString(opt.name, opt.required);
+      case ApplicationCommandOptionType.Subcommand:
+        return interaction.options.getSubcommand();
+      case ApplicationCommandOptionType.SubcommandGroup:
+        return interaction.options.getSubcommandGroup();
+      case ApplicationCommandOptionType.User:
+        return interaction.options.getUser(opt.name, opt.required);
+    }
+  }
 
   //TODO: Implement a parsing function that will use command data to create an object containing all the options information from the message
-  /*private parseMessageArgs(
-    message: Message,
-    options: ApplicationCommandOptionData[],
-  ) {}*/
+  private parseMessageArgs(message: Message, command: Command) {
+    const messageArgs = message.content.split(" ").toSpliced(0, 1);
+    const options = command.data.toJSON().options;
+    if (!options) return {};
+    const verifier = new ArgumentVerifier(options, messageArgs);
+    try {
+      const res = verifier.parse();
+      return res;
+    } catch (e) {
+      return { error: e };
+    }
+  }
 
   /**
    * Imports the provided file as a Command object and adds it to the collection.
