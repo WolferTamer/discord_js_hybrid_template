@@ -19,6 +19,7 @@ export default new Command(
     });
     await new Promise((r) => setTimeout(r, 2000));
     const val = ctx.args["testoption"] as string | undefined;
+    const num = ctx.args["testuser"] as number | undefined;
     const embed = new EmbedBuilder()
       .setTitle("Test Embed!")
       .setDescription(val ?? "this is a big ol' test.")
@@ -41,7 +42,7 @@ export default new Command(
     });
     await new Promise((r) => setTimeout(r, 2000));
     await ctx.editMessage({
-      content: "I got edited!",
+      content: "I got edited! " + num,
       embeds: [],
       components: [actionrow],
       flags: undefined,
@@ -58,7 +59,8 @@ export default new Command(
       opt
         .setName("testoption")
         .setDescription("An extra option")
-        .setRequired(false)
-        .setMaxLength(50),
-    ),
+        .setMaxLength(50)
+        .setRequired(true),
+    )
+    .addRoleOption((opt) => opt.setName("testuser").setDescription("A Role")),
 );

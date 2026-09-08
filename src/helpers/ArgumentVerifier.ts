@@ -1,6 +1,9 @@
 import {
   APIApplicationCommandOption,
   ApplicationCommandOptionType,
+  MessageMentions,
+  Role,
+  User,
 } from "discord.js";
 import { OptionType } from "../types.js";
 
@@ -10,9 +13,15 @@ import { OptionType } from "../types.js";
 export default class ArgumentVerifier {
   private options: APIApplicationCommandOption[];
   private args: string[];
-  constructor(options: APIApplicationCommandOption[], args: string[]) {
+  private mentions: MessageMentions | undefined;
+  constructor(
+    options: APIApplicationCommandOption[],
+    args: string[],
+    mentions?: MessageMentions,
+  ) {
     this.options = options;
     this.args = args;
+    this.mentions = mentions;
   }
 
   /**
@@ -23,6 +32,13 @@ export default class ArgumentVerifier {
     const results: { [keyof: string]: OptionType } = {};
     let index = 0;
     for (const opt of this.options) {
+      if (this.args[index] === "") {
+        results[opt.name] = undefined;
+        if (opt.required) {
+          throw Error(`${opt.name} is required.`);
+        }
+        continue;
+      }
       switch (opt.type) {
         case ApplicationCommandOptionType.Integer:
           results[opt.name] = this.verifyInteger(opt, index);
@@ -31,11 +47,16 @@ export default class ArgumentVerifier {
           results[opt.name] = this.verifyNum(opt, index);
           break;
         case ApplicationCommandOptionType.String:
-          if (this.verifyString(opt, index) === "") break;
-          results[opt.name] = this.verifyString(opt, index) === "";
+          results[opt.name] = this.verifyString(opt, index);
           break;
         case ApplicationCommandOptionType.Boolean:
           results[opt.name] = this.verifyBoolean(opt, index);
+          break;
+        case ApplicationCommandOptionType.User:
+          results[opt.name] = this.verifyUser(opt, index);
+          break;
+        case ApplicationCommandOptionType.Role:
+          results[opt.name] = this.verifyRole(opt, index);
           break;
       }
       index++;
@@ -52,7 +73,7 @@ export default class ArgumentVerifier {
   private verifyNum(
     option: APIApplicationCommandOption,
     index: number,
-  ): number {
+  ): number | undefined {
     if (option.type === ApplicationCommandOptionType.Number) {
       if (option.required && index >= this.args.length)
         throw Error(`${option.name} is required.`);
@@ -65,7 +86,7 @@ export default class ArgumentVerifier {
         throw Error(`${option.name} must be one of the given choices.`);
       return val;
     }
-    return -1;
+    return undefined;
   }
 
   /**
@@ -77,13 +98,13 @@ export default class ArgumentVerifier {
   private verifyString(
     option: APIApplicationCommandOption,
     index: number,
-  ): string {
+  ): string | undefined {
     if (option.type === ApplicationCommandOptionType.String) {
       if (index >= this.args.length) {
         if (option.required) {
           throw Error(`${option.name} is required.`);
         } else {
-          return "";
+          return undefined;
         }
       }
 
@@ -108,7 +129,7 @@ export default class ArgumentVerifier {
         throw Error(`${option.name} must be one of the given choices.`);
       return val;
     }
-    return "";
+    return undefined;
   }
 
   /**
@@ -120,7 +141,7 @@ export default class ArgumentVerifier {
   private verifyBoolean(
     option: APIApplicationCommandOption,
     index: number,
-  ): boolean {
+  ): boolean | undefined {
     if (option.type === ApplicationCommandOptionType.Boolean) {
       if (option.required && index >= this.args.length)
         throw Error(`${option.name} is required.`);
@@ -139,7 +160,7 @@ export default class ArgumentVerifier {
       }
       throw Error(`${option.name} must be yes/no or true/false.`);
     }
-    return false;
+    return undefined;
   }
 
   /**
@@ -151,10 +172,13 @@ export default class ArgumentVerifier {
   private verifyInteger(
     option: APIApplicationCommandOption,
     index: number,
-  ): number {
+  ): number | undefined {
     if (option.type === ApplicationCommandOptionType.Integer) {
-      if (option.required && index >= this.args.length)
-        throw Error(`${option.name} is required.`);
+      if (index >= this.args.length) {
+        if (option.required) throw Error(`${option.name} is required.`);
+        else return undefined;
+      }
+
       const val = +this.args[index];
       if (val % 1 != 0) throw Error(`${option.name} must be an integer.`);
       if (option.max_value && val > option.max_value)
@@ -165,6 +189,55 @@ export default class ArgumentVerifier {
         throw Error(`${option.name} must be one of the given choices.`);
       return val;
     }
-    return -1;
+    return undefined;
+  }
+
+  private verifyUser(
+    option: APIApplicationCommandOption,
+    index: number,
+  ): User | undefined {
+    if (option.type === ApplicationCommandOptionType.User) {
+      if (index >= this.args.length) {
+        if (option.required) throw Error(`${option.name} is required.`);
+        else return undefined;
+      }
+      const useridRegex = /<@(\d{17,18})>/;
+      if (this.mentions) {
+        const res = useridRegex.exec(this.args[index]);
+        if (res && res.length > 1) {
+          const user = this.mentions.parsedUsers.get(res[1]);
+          return user;
+        } else {
+          throw Error(`${option.name} is not a user.`);
+        }
+      } else {
+        throw Error(`${option.name} is not a user.`);
+      }
+    }
+  }
+
+  private verifyRole(
+    option: APIApplicationCommandOption,
+    index: number,
+  ): Role | undefined {
+    if (option.type === ApplicationCommandOptionType.Role) {
+      if (index >= this.args.length) {
+        if (option.required) throw Error(`${option.name} is required.`);
+        else return undefined;
+      }
+      const roleidRegex = /<@&(\d{18,20})>/;
+      if (this.mentions) {
+        const res = roleidRegex.exec(this.args[index]);
+        if (res && res.length > 1) {
+          const role = this.mentions.roles.get(res[1]);
+          return role;
+        } else {
+          throw Error(`${option.name} is not a role.`);
+        }
+        return undefined;
+      } else {
+        throw Error(`${option.name} is not a role.`);
+      }
+    }
   }
 }

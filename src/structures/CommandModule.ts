@@ -141,7 +141,11 @@ export default class CommandModule extends BaseModule<string, Command> {
     const messageArgs = message.content.split(" ").toSpliced(0, 1);
     const options = command.data.toJSON().options;
     if (!options) return {};
-    const verifier = new ArgumentVerifier(options, messageArgs);
+    const verifier = new ArgumentVerifier(
+      options,
+      messageArgs,
+      message.mentions,
+    );
     try {
       const res = verifier.parse();
       return res;
