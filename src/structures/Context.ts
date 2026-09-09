@@ -18,6 +18,8 @@ import {
   User,
 } from "discord.js";
 import { OptionType, UniversalMessageOptions } from "../types.js";
+import { IncludedRow, NoIncludes } from "@prisma/orm-mongo/orm";
+import { Contract } from "../prisma/contract.js";
 
 /**Class that acts as a dynamic context that can handle both messages and command interactions. Interface between the command logic and message sending. */
 export class Context {
@@ -30,7 +32,9 @@ export class Context {
   channel: SendableChannels;
   client: Client;
   author: User;
+  authorData: IncludedRow<Contract, "User", NoIncludes>;
   guild: Guild | null;
+  guildData: IncludedRow<Contract, "Guild", NoIncludes> | null;
   response: Message | null;
   args: { [key: string]: OptionType };
   /**
@@ -43,6 +47,8 @@ export class Context {
   constructor(
     context: ChatInputCommandInteraction | Message,
     args: { [key: string]: OptionType },
+    userData: IncludedRow<Contract, "User", NoIncludes>,
+    guildData: IncludedRow<Contract, "Guild", NoIncludes> | null
   ) {
     this.context = context;
     this.isInteraction = context instanceof ChatInputCommandInteraction;
@@ -61,6 +67,8 @@ export class Context {
     this.guild = context.guild;
     this.response = null;
     this.args = args;
+    this.authorData = userData
+    this.guildData = guildData
   }
 
   /**

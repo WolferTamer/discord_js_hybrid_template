@@ -25,6 +25,7 @@ import { userRepository } from "../db/userRepository.js";
 import { IncludedRow, NoIncludes } from "@prisma/orm-mongo/orm";
 import { Contract } from "../prisma/contract.js";
 import { guildRepository } from "../db/guildRepository.js";
+import { BaseError } from "../errors/index.js";
 
 /**Class that handles the tracking and executing of commands. */
 export default class CommandModule extends BaseModule<string, Command> {
@@ -50,15 +51,19 @@ export default class CommandModule extends BaseModule<string, Command> {
         const args = this.parseInteractionArgs(interaction, command);
         try {
           const userData = await this.fetchAuthorData(interaction.user)
-          const guildData = interaction.guild ? await this.fetchGuildData(interaction.guild) : undefined
-          console.log(`UserID: ${userData._id}, GuildID: ${guildData ? guildData._id : "NONE"}`)
-          const context = new Context(interaction, args);
+          const guildData = interaction.guild ? await this.fetchGuildData(interaction.guild) : null
+
+          const context = new Context(interaction, args, userData, guildData);
           if (!command) {
             throw Error("Command does not exist");
           }
           await command.execute(context);
-        } catch {
-          interaction.reply({content: "We encountered an error retrieving your data. Please try again.", flags: MessageFlags.Ephemeral})
+        } catch(e) {
+          if(e instanceof BaseError) {
+            interaction.reply({content: "We encountered an error retrieving your data. Please try again.", flags: MessageFlags.Ephemeral})
+          } else {
+            interaction.reply({content: "We encountered an error. Please try again.", flags: MessageFlags.Ephemeral})
+          }
         }
       },
     );
@@ -77,18 +82,20 @@ export default class CommandModule extends BaseModule<string, Command> {
       } else {
         try {
           const userData = await this.fetchAuthorData(message.author)
-          const guildData = message.guild ? await this.fetchGuildData(message.guild) : undefined
-          console.log(`UserID: ${userData._id}, GuildID: ${guildData ? guildData._id : "NONE"}`)
+          const guildData = message.guild ? await this.fetchGuildData(message.guild) : null
           const context = new Context(
             message,
             parsedArgs as { [keyof: string]: OptionType },
+            userData, guildData
           );
           await command.execute(context)
-        } catch {
-          if(message.channel.isSendable()) {
-            message.channel.send("We encountered an error getting your information. Please try again!")
+        } catch(e) {
+          if(e instanceof BaseError) {
+            message.reply({content: "We encountered an error retrieving your data. Please try again."})
+          } else {
+            message.reply({content: "We encountered an error. Please try again."})
           }
-        };
+        }
       }
     });
   }
