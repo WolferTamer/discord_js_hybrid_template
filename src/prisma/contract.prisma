@@ -1,0 +1,17 @@
+// use prisma-next
+
+model User {
+  id              ObjectId @id @map("_id")
+  discordId       String   @unique
+  username        String   @unique
+  displayName     String?
+  @@map("users")
+}
+
+model Guild {
+  id                ObjectId @id @map("_id")
+  discordId         String   @unique
+  name              String
+  defaultChannel    String?
+  @@map("guilds")
+}

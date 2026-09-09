@@ -3,13 +3,16 @@ import {
   ApplicationCommandOptionType,
   ChatInputCommandInteraction,
   Collection,
+  Guild,
   Interaction,
   InteractionType,
   Message,
+  MessageFlags,
   REST,
   RESTPostAPIChatInputApplicationCommandsJSONBody,
   Routes,
   TextChannel,
+  User,
 } from "discord.js";
 import BaseClient from "../client.js";
 import BaseModule from "./BaseModule.js";
@@ -18,6 +21,10 @@ import { Context } from "./Context.js";
 import Config from "../config.js";
 import ArgumentVerifier from "../helpers/ArgumentVerifier.js";
 import { OptionType } from "../types.js";
+import { userRepository } from "../db/userRepository.js";
+import { IncludedRow, NoIncludes } from "@prisma/orm-mongo/orm";
+import { Contract } from "../prisma/contract.js";
+import { guildRepository } from "../db/guildRepository.js";
 
 /**Class that handles the tracking and executing of commands. */
 export default class CommandModule extends BaseModule<string, Command> {
@@ -41,11 +48,18 @@ export default class CommandModule extends BaseModule<string, Command> {
         const command = this.collection.get(interaction.commandName);
         if (!command) return;
         const args = this.parseInteractionArgs(interaction, command);
-        const context = new Context(interaction, args);
-        if (!command) {
-          throw Error("Command does not exist");
+        try {
+          const userData = await this.fetchAuthorData(interaction.user)
+          const guildData = interaction.guild ? await this.fetchGuildData(interaction.guild) : undefined
+          console.log(`UserID: ${userData._id}, GuildID: ${guildData ? guildData._id : "NONE"}`)
+          const context = new Context(interaction, args);
+          if (!command) {
+            throw Error("Command does not exist");
+          }
+          await command.execute(context);
+        } catch {
+          interaction.reply({content: "We encountered an error retrieving your data. Please try again.", flags: MessageFlags.Ephemeral})
         }
-        await command.execute(context);
       },
     );
 
@@ -61,11 +75,20 @@ export default class CommandModule extends BaseModule<string, Command> {
           `Unable to parse your command. ${parsedArgs.error}`,
         );
       } else {
-        const context = new Context(
-          message,
-          parsedArgs as { [keyof: string]: OptionType },
-        );
-        await command.execute(context);
+        try {
+          const userData = await this.fetchAuthorData(message.author)
+          const guildData = message.guild ? await this.fetchGuildData(message.guild) : undefined
+          console.log(`UserID: ${userData._id}, GuildID: ${guildData ? guildData._id : "NONE"}`)
+          const context = new Context(
+            message,
+            parsedArgs as { [keyof: string]: OptionType },
+          );
+          await command.execute(context)
+        } catch {
+          if(message.channel.isSendable()) {
+            message.channel.send("We encountered an error getting your information. Please try again!")
+          }
+        };
       }
     });
   }
@@ -230,5 +253,25 @@ export default class CommandModule extends BaseModule<string, Command> {
         console.error(error);
       }
     })();
+  }
+
+  async fetchAuthorData(user: User) : Promise<IncludedRow<Contract, "User", NoIncludes>> {
+    
+      const userData = await userRepository.findByDiscordId(user.id)
+      if(userData) {
+        return userData
+      }
+      const newUser = await userRepository.create(user.id, user.tag, user.displayName)
+      return newUser
+    
+  }
+
+  async fetchGuildData(guild: Guild) : Promise<IncludedRow<Contract, "Guild", NoIncludes>> {
+    const guildData = await guildRepository.findByDiscordId(guild.id)
+      if(guildData) {
+        return guildData
+      }
+      const newGuild = await guildRepository.create(guild.id, guild.name)
+      return newGuild
   }
 }
