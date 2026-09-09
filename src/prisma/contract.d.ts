@@ -17,7 +17,7 @@ import type {
 } from '@prisma/orm-mongo/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'c3d37a6d9e3066a551c8b0d751d6ee0e4a1197b3fc3e08d8bae2789df0a47310'>;
+  StorageHashBase<'cd21a124ccfe8678dd9d6f4474be9e25d2f6c20d1d12f2cf45f5efd32b1fdd07'>;
 export type ExecutionHash = ExecutionHashBase<string>;
 export type ProfileHash =
   ProfileHashBase<'251b3ce23f6c9f561892e7c1af9d2cc941a13d64ba1aa7226b90036b09568cc3'>;
@@ -30,6 +30,7 @@ export type FieldOutputTypes = {
       readonly _id: CodecTypes['mongo/objectId@1']['output'];
       readonly discordId: CodecTypes['mongo/string@1']['output'];
       readonly name: CodecTypes['mongo/string@1']['output'];
+      readonly prefix: CodecTypes['mongo/string@1']['output'];
       readonly defaultChannel: CodecTypes['mongo/string@1']['output'] | null;
     };
     readonly User: {
@@ -46,6 +47,7 @@ export type FieldInputTypes = {
       readonly _id: CodecTypes['mongo/objectId@1']['input'];
       readonly discordId: CodecTypes['mongo/string@1']['input'];
       readonly name: CodecTypes['mongo/string@1']['input'];
+      readonly prefix: CodecTypes['mongo/string@1']['input'];
       readonly defaultChannel: CodecTypes['mongo/string@1']['input'] | null;
     };
     readonly User: {
@@ -83,10 +85,11 @@ type ContractBase = Omit<
                     readonly _id: { readonly bsonType: 'objectId' };
                     readonly discordId: { readonly bsonType: 'string' };
                     readonly name: { readonly bsonType: 'string' };
+                    readonly prefix: { readonly bsonType: 'string' };
                     readonly defaultChannel: { readonly bsonType: readonly ['null', 'string'] };
                   };
                   readonly additionalProperties: false;
-                  readonly required: readonly ['_id', 'discordId', 'name'];
+                  readonly required: readonly ['_id', 'discordId', 'name', 'prefix'];
                 };
                 readonly validationLevel: 'strict';
                 readonly validationAction: 'error';
@@ -152,6 +155,10 @@ type ContractBase = Omit<
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
               };
               readonly name: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
+              };
+              readonly prefix: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
               };

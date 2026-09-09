@@ -10,7 +10,8 @@
     "register:dev": "tsx src/scripts/registerCommands.ts",
     "register": "node dist/scripts/registerCommands.js",
     "lint": "npx eslint src/",
-    "contract:emit": "prisma contract emit"
+    "contract:emit": "prisma contract emit",
+    "db:migrate": "prisma db migrate"
   },
   "keywords": [
     "discord",

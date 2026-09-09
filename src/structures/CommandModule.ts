@@ -50,19 +50,28 @@ export default class CommandModule extends BaseModule<string, Command> {
         if (!command) return;
         const args = this.parseInteractionArgs(interaction, command);
         try {
-          const userData = await this.fetchAuthorData(interaction.user)
-          const guildData = interaction.guild ? await this.fetchGuildData(interaction.guild) : null
+          const userData = await this.fetchAuthorData(interaction.user);
+          const guildData = interaction.guild
+            ? await this.fetchGuildData(interaction.guild)
+            : null;
 
           const context = new Context(interaction, args, userData, guildData);
           if (!command) {
             throw Error("Command does not exist");
           }
           await command.execute(context);
-        } catch(e) {
-          if(e instanceof BaseError) {
-            interaction.reply({content: "We encountered an error retrieving your data. Please try again.", flags: MessageFlags.Ephemeral})
+        } catch (e) {
+          if (e instanceof BaseError) {
+            interaction.reply({
+              content:
+                "We encountered an error retrieving your data. Please try again.",
+              flags: MessageFlags.Ephemeral,
+            });
           } else {
-            interaction.reply({content: "We encountered an error. Please try again.", flags: MessageFlags.Ephemeral})
+            interaction.reply({
+              content: "We encountered an error. Please try again.",
+              flags: MessageFlags.Ephemeral,
+            });
           }
         }
       },
@@ -81,19 +90,27 @@ export default class CommandModule extends BaseModule<string, Command> {
         );
       } else {
         try {
-          const userData = await this.fetchAuthorData(message.author)
-          const guildData = message.guild ? await this.fetchGuildData(message.guild) : null
+          const userData = await this.fetchAuthorData(message.author);
+          const guildData = message.guild
+            ? await this.fetchGuildData(message.guild)
+            : null;
           const context = new Context(
             message,
             parsedArgs as { [keyof: string]: OptionType },
-            userData, guildData
+            userData,
+            guildData,
           );
-          await command.execute(context)
-        } catch(e) {
-          if(e instanceof BaseError) {
-            message.reply({content: "We encountered an error retrieving your data. Please try again."})
+          await command.execute(context);
+        } catch (e) {
+          if (e instanceof BaseError) {
+            message.reply({
+              content:
+                "We encountered an error retrieving your data. Please try again.",
+            });
           } else {
-            message.reply({content: "We encountered an error. Please try again."})
+            message.reply({
+              content: "We encountered an error. Please try again.",
+            });
           }
         }
       }
@@ -262,23 +279,29 @@ export default class CommandModule extends BaseModule<string, Command> {
     })();
   }
 
-  async fetchAuthorData(user: User) : Promise<IncludedRow<Contract, "User", NoIncludes>> {
-    
-      const userData = await userRepository.findByDiscordId(user.id)
-      if(userData) {
-        return userData
-      }
-      const newUser = await userRepository.create(user.id, user.tag, user.displayName)
-      return newUser
-    
+  async fetchAuthorData(
+    user: User,
+  ): Promise<IncludedRow<Contract, "User", NoIncludes>> {
+    const userData = await userRepository.findByDiscordId(user.id);
+    if (userData) {
+      return userData;
+    }
+    const newUser = await userRepository.create(
+      user.id,
+      user.tag,
+      user.displayName,
+    );
+    return newUser;
   }
 
-  async fetchGuildData(guild: Guild) : Promise<IncludedRow<Contract, "Guild", NoIncludes>> {
-    const guildData = await guildRepository.findByDiscordId(guild.id)
-      if(guildData) {
-        return guildData
-      }
-      const newGuild = await guildRepository.create(guild.id, guild.name)
-      return newGuild
+  async fetchGuildData(
+    guild: Guild,
+  ): Promise<IncludedRow<Contract, "Guild", NoIncludes>> {
+    const guildData = await guildRepository.findByDiscordId(guild.id);
+    if (guildData) {
+      return guildData;
+    }
+    const newGuild = await guildRepository.create(guild.id, guild.name);
+    return newGuild;
   }
 }

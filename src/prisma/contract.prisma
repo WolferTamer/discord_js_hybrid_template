@@ -12,6 +12,7 @@ model Guild {
   id                ObjectId @id @map("_id")
   discordId         String   @unique
   name              String
+  prefix            String   @default(":")
   defaultChannel    String?
   @@map("guilds")
 }

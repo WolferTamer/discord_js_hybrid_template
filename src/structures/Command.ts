@@ -3,7 +3,7 @@ import BaseComponent from "./BaseComponent.js";
 import { Context } from "./Context.js";
 
 /** Representation of a Command. */
-export default class Command extends BaseComponent {
+export default class Command extends BaseComponent<Context> {
   public readonly data: SlashCommandOptionsOnlyBuilder;
   constructor(
     id: string,

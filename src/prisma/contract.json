@@ -46,6 +46,13 @@
                   "codecId": "mongo/string@1",
                   "kind": "scalar"
                 }
+              },
+              "prefix": {
+                "nullable": false,
+                "type": {
+                  "codecId": "mongo/string@1",
+                  "kind": "scalar"
+                }
               }
             },
             "relations": {},
@@ -131,12 +138,16 @@
                     },
                     "name": {
                       "bsonType": "string"
+                    },
+                    "prefix": {
+                      "bsonType": "string"
                     }
                   },
                   "required": [
                     "_id",
                     "discordId",
-                    "name"
+                    "name",
+                    "prefix"
                   ]
                 },
                 "kind": "mongo-validator",
@@ -206,7 +217,7 @@
         "kind": "mongo-database"
       }
     },
-    "storageHash": "c3d37a6d9e3066a551c8b0d751d6ee0e4a1197b3fc3e08d8bae2789df0a47310"
+    "storageHash": "cd21a124ccfe8678dd9d6f4474be9e25d2f6c20d1d12f2cf45f5efd32b1fdd07"
   },
   "capabilities": {},
   "extensions": {},
