@@ -5,6 +5,7 @@ import EventModule from "./structures/EventModule.js";
 import { existsSync } from "fs";
 import GuildData from "./structures/GuildData.js";
 import { guildRepository } from "./db/guildRepository.js";
+import signale, { Signale } from "signale";
 
 /*
   Extension of the Discord.JS Client class. Serves to store collections of commands, events. etc...
@@ -15,6 +16,7 @@ export default class BaseClient extends Client {
   public events: EventModule;
   public guildData: Collection<string, GuildData>;
   public readonly dirname: string;
+  public logger: Signale;
   constructor(registerCommands: boolean = false) {
     super({
       intents: [
@@ -43,6 +45,7 @@ export default class BaseClient extends Client {
       this.commands.loadAll();
     }
     this.events.loadAll();
+    this.logger = signale;
   }
 
   async getGuildData(discordId: string) {
@@ -56,7 +59,7 @@ export default class BaseClient extends Client {
         return { prefix: dbData.prefix };
       }
     } catch (e) {
-      console.warn(
+      this.logger.warn(
         `Guild information failed to load data for ${discordId}: ${e}`,
       );
     }
@@ -67,8 +70,8 @@ export default class BaseClient extends Client {
     try {
       await super.login(Config.TOKEN);
     } catch (e) {
-      console.error("Failure during client startup");
-      console.error(e);
+      this.logger.error("Failure during client startup");
+      this.logger.error(e);
       process.exit(-1);
     }
   }

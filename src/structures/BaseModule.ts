@@ -50,7 +50,7 @@ export default abstract class BaseModule<T, V> {
       try {
         this.load(file);
       } catch (e) {
-        console.error(e);
+        this.client.logger.error(e);
       }
     }
   }

@@ -229,7 +229,7 @@ export default class CommandModule extends BaseModule<string, Command> {
       try {
         this.load(file);
       } catch (e) {
-        console.error(e);
+        this.client.logger.error(e);
       }
     }
   }
@@ -244,7 +244,7 @@ export default class CommandModule extends BaseModule<string, Command> {
       try {
         promises.push(this.load(file));
       } catch (e) {
-        console.error(e);
+        this.client.logger.error(e);
       }
     }
     await Promise.all(promises);
@@ -263,7 +263,7 @@ export default class CommandModule extends BaseModule<string, Command> {
 
     (async () => {
       try {
-        console.log(
+        this.client.logger.info(
           `Started refreshing ${comms.length} application (/) commands.`,
         );
 
@@ -283,7 +283,7 @@ export default class CommandModule extends BaseModule<string, Command> {
         );*/
       } catch (error) {
         // And of course, make sure you catch and log any errors!
-        console.error(error);
+        this.client.logger.error(error);
       }
     })();
   }
