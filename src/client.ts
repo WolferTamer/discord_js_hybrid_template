@@ -3,7 +3,8 @@ import Config from "./config.js";
 import CommandModule from "./structures/CommandModule.js";
 import EventModule from "./structures/EventModule.js";
 import { existsSync } from "fs";
-import GuildData, { loadGuildData } from "./structures/GuildData.js";
+import GuildData from "./structures/GuildData.js";
+import { guildRepository } from "./db/guildRepository.js";
 
 /*
   Extension of the Discord.JS Client class. Serves to store collections of commands, events. etc...
@@ -35,7 +36,6 @@ export default class BaseClient extends Client {
     this.commands = new CommandModule(this);
     this.events = new EventModule(this);
     this.guildData = new Collection<string, GuildData>();
-    loadGuildData(this);
     this.dirname = existsSync("./src") ? "./src" : "./";
     if (registerCommands) {
       this.commands.loadAndRegisterAll();
@@ -43,6 +43,24 @@ export default class BaseClient extends Client {
       this.commands.loadAll();
     }
     this.events.loadAll();
+  }
+
+  async getGuildData(discordId: string) {
+    const data = this.guildData.get(discordId);
+    if (data) return data;
+
+    try {
+      const dbData = await guildRepository.findByDiscordId(discordId);
+      if (dbData) {
+        this.guildData.set(discordId, { prefix: dbData.prefix });
+        return { prefix: dbData.prefix };
+      }
+    } catch (e) {
+      console.warn(
+        `Guild information failed to load data for ${discordId}: ${e}`,
+      );
+    }
+    return undefined;
   }
 
   async start() {

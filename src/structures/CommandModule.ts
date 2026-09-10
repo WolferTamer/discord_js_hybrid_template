@@ -78,11 +78,9 @@ export default class CommandModule extends BaseModule<string, Command> {
     );
 
     client.addListener("messageCreate", async (message: Message) => {
-      const prefix =
-        (message.guildId
-          ? client.guildData.get(message.guildId)?.prefix
-          : undefined) ?? ":";
+      const prefix = await this.getGuildPrefix(message.guildId);
       if (!message.content.startsWith(prefix)) return;
+
       const args = message.content.split(" ");
       const commandId = args[0].substring(1);
       const command = this.collection.get(commandId);
@@ -119,6 +117,13 @@ export default class CommandModule extends BaseModule<string, Command> {
         }
       }
     });
+  }
+
+  private async getGuildPrefix(discordid: string | null) {
+    if (!discordid) return ":";
+    const guildData = await this.client.getGuildData(discordid);
+    if (!guildData) return ":";
+    return guildData.prefix;
   }
 
   /**
