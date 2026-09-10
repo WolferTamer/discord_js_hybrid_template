@@ -78,7 +78,11 @@ export default class CommandModule extends BaseModule<string, Command> {
     );
 
     client.addListener("messageCreate", async (message: Message) => {
-      if (!message.content.startsWith(":")) return;
+      const prefix =
+        (message.guildId
+          ? client.guildData.get(message.guildId)?.prefix
+          : undefined) ?? ":";
+      if (!message.content.startsWith(prefix)) return;
       const args = message.content.split(" ");
       const commandId = args[0].substring(1);
       const command = this.collection.get(commandId);

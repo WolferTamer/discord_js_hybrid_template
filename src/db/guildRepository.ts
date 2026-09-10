@@ -5,6 +5,9 @@ export const guildRepository = {
   async findByDiscordId(discordId: string) {
     return handleDbErrors(() => db.orm.guilds.where({ discordId }).first());
   },
+  async getAll() {
+    return handleDbErrors(async () => await db.orm.guilds.all());
+  },
   async findByDiscordIdOrCreate(discordId: string, name: string) {
     return handleDbErrors(async () => {
       const guild = await db.orm.guilds.where({ discordId }).first();

@@ -1,8 +1,9 @@
-import { Client, GatewayIntentBits, Partials } from "discord.js";
+import { Client, Collection, GatewayIntentBits, Partials } from "discord.js";
 import Config from "./config.js";
 import CommandModule from "./structures/CommandModule.js";
 import EventModule from "./structures/EventModule.js";
 import { existsSync } from "fs";
+import GuildData, { loadGuildData } from "./structures/GuildData.js";
 
 /*
   Extension of the Discord.JS Client class. Serves to store collections of commands, events. etc...
@@ -11,6 +12,7 @@ import { existsSync } from "fs";
 export default class BaseClient extends Client {
   public commands: CommandModule;
   public events: EventModule;
+  public guildData: Collection<string, GuildData>;
   public readonly dirname: string;
   constructor(registerCommands: boolean = false) {
     super({
@@ -32,6 +34,8 @@ export default class BaseClient extends Client {
     });
     this.commands = new CommandModule(this);
     this.events = new EventModule(this);
+    this.guildData = new Collection<string, GuildData>();
+    loadGuildData(this);
     this.dirname = existsSync("./src") ? "./src" : "./";
     if (registerCommands) {
       this.commands.loadAndRegisterAll();
