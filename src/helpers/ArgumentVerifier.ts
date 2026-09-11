@@ -68,7 +68,7 @@ export default class ArgumentVerifier {
    * Makes sure the provided number matches the required parameters.
    * @param {APIApplicationCommandOption} option
    * @param {number} index
-   * @returns {number}
+   * @returns {number | undefined}
    */
   private verifyNum(
     option: APIApplicationCommandOption,
@@ -93,7 +93,7 @@ export default class ArgumentVerifier {
    * Makes sure the provided string matches the required parameters. Empty string if the number is not required.
    * @param {APIApplicationCommandOption} option
    * @param {number} index
-   * @returns {string}
+   * @returns {string | undefined}
    */
   private verifyString(
     option: APIApplicationCommandOption,
@@ -136,7 +136,7 @@ export default class ArgumentVerifier {
    * Makes sure the provided boolean matches the required parameters.
    * @param {APIApplicationCommandOption} option
    * @param {number} index
-   * @returns {bolean}
+   * @returns {bolean | undefined}
    */
   private verifyBoolean(
     option: APIApplicationCommandOption,
@@ -167,7 +167,7 @@ export default class ArgumentVerifier {
    * Makes sure the provided integer matches the required parameters.
    * @param {APIApplicationCommandOption} option
    * @param {number} index
-   * @returns {number}
+   * @returns {number | undefined}
    */
   private verifyInteger(
     option: APIApplicationCommandOption,
@@ -192,6 +192,12 @@ export default class ArgumentVerifier {
     return undefined;
   }
 
+  /**
+   * Makes sure the user is valid and matches the requirements.
+   * @param {APIApplicationCommandOption} option
+   * @param {number} index
+   * @returns {User | undefined}
+   */
   private verifyUser(
     option: APIApplicationCommandOption,
     index: number,
@@ -216,6 +222,12 @@ export default class ArgumentVerifier {
     }
   }
 
+  /**
+   * Makes sure the role is valid and matches the requirements.
+   * @param {APIApplicationCommandOption} option
+   * @param {number} index
+   * @returns {Role | undefined}
+   */
   private verifyRole(
     option: APIApplicationCommandOption,
     index: number,

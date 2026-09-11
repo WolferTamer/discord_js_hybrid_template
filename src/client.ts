@@ -12,9 +12,12 @@ import signale, { Signale } from "signale";
 */
 
 export default class BaseClient extends Client {
+  /* The commands and events modules hold all of the defined events and manage their execution. */
   public commands: CommandModule;
   public events: EventModule;
+  /* guildData holds information on guilds that is accessed regularly enough that avoiding a DB call is necessary. E.G. prefixes */
   public guildData: Collection<string, GuildData>;
+  /* The directory in which code is held. */
   public readonly dirname: string;
   public logger: Signale;
   constructor(registerCommands: boolean = false) {
@@ -48,7 +51,12 @@ export default class BaseClient extends Client {
     this.logger = signale;
   }
 
-  async getGuildData(discordId: string) {
+  /**
+   * Fetches the information about the provided guild either from guildData or the DB
+   * @param {string} discordId The ID of the guild to fetch the data for.
+   * @returns {Promise<GuildData | undefined>}
+   */
+  async getGuildData(discordId: string): Promise<GuildData | undefined> {
     const data = this.guildData.get(discordId);
     if (data) return data;
 

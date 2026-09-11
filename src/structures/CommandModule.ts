@@ -119,7 +119,12 @@ export default class CommandModule extends BaseModule<string, Command> {
     });
   }
 
-  private async getGuildPrefix(discordid: string | null) {
+  /**
+   * Gets the assigned prefix for the server or the default value
+   * @param {string|null} discordid
+   * @returns {string}
+   */
+  private async getGuildPrefix(discordid: string | null): Promise<string> {
     if (!discordid) return ":";
     const guildData = await this.client.getGuildData(discordid);
     if (!guildData) return ":";
@@ -183,7 +188,6 @@ export default class CommandModule extends BaseModule<string, Command> {
     }
   }
 
-  //TODO: Implement a parsing function that will use command data to create an object containing all the options information from the message
   /**
    * Description
    * @param {Message} message
@@ -288,6 +292,11 @@ export default class CommandModule extends BaseModule<string, Command> {
     })();
   }
 
+  /**
+   * Fetches the user information from the database or creates a new entry.
+   * @param {User} user
+   * @returns {IncludedRow<Contract, "User", NoIncludes> }
+   */
   async fetchAuthorData(
     user: User,
   ): Promise<IncludedRow<Contract, "User", NoIncludes>> {
@@ -302,7 +311,11 @@ export default class CommandModule extends BaseModule<string, Command> {
     );
     return newUser;
   }
-
+  /**
+   * Fetches the guild information from the database or creates a new entry.
+   * @param {Guild} guild
+   * @returns {IncludedRow<Contract, "Guild", NoIncludes> }
+   */
   async fetchGuildData(
     guild: Guild,
   ): Promise<IncludedRow<Contract, "Guild", NoIncludes>> {

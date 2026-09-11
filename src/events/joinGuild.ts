@@ -2,6 +2,9 @@ import { Events, Guild } from "discord.js";
 import Event from "../structures/Event";
 import { guildRepository } from "../db/guildRepository";
 
+/**
+ * Is called upon joining a guild and creates a new DB entry.
+ */
 export default new Event(
   Events.GuildCreate,
   async (ctx: Guild) => {
